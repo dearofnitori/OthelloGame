@@ -1,4 +1,5 @@
 package game;
+import java.awt.BorderLayout;
 //OthelloGUI
 import java.awt.Color;
 import java.awt.Dimension;
@@ -13,38 +14,31 @@ public class Game extends JPanel implements MouseListener {
     private static final int SIZE = 8;
     private int[][] board = new int[SIZE][SIZE]; // 0=空, 1=黒, 2=白
     private int currentPlayer = 1; // 1=黒, 2=白
-    
-    public Game() {
+    private BoardRenderer renderer = new BoardRenderer(); // ← これを追加
+    private GameInfoPanel infoPanel; // 手番・石数表示用パネル
+
+    // GameInfoPanelを受け取るコンストラクタ（盤面初期化も含む）
+    public Game(GameInfoPanel infoPanel) {
+        this.infoPanel = infoPanel;
         setPreferredSize(new Dimension(400, 400));
         setBackground(Color.GREEN);
         addMouseListener(this);
-        initBoard();
+        initBoard(); // ← 盤面初期化を忘れずに！
     }
+
     private void initBoard() {
         board[3][3] = 2; // 白
         board[3][4] = 1; // 黒
         board[4][3] = 1; // 黒
         board[4][4] = 2; // 白
     }
-
+// 追加項目 描画呼び出し
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        int tileSize = getWidth() / SIZE;
-
-        // 盤面描画
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                g.setColor(Color.BLACK);
-                g.drawRect(j * tileSize, i * tileSize, tileSize, tileSize);
-
-                // 石描画
-                if (board[i][j] != 0) {
-                    g.setColor(board[i][j] == 1 ? Color.BLACK : Color.WHITE);
-                    g.fillOval(j * tileSize + 5, i * tileSize + 5, tileSize - 10, tileSize - 10);
-                }
-            }
-        }
+        super.paintComponent(g); // 背景クリア
+        
+        // BoardRendererに盤面と石の描画を任せる
+        renderer.drawBoard(g, board, getWidth(), getHeight());
     }
 
     @Override
@@ -56,13 +50,14 @@ public class Game extends JPanel implements MouseListener {
 //追加した箇所
         if (board[row][col] == 0) {
 //修正箇所、GUI側で合法手のチェックを導入
-        	 ReverseStone3 reverser = new ReverseStone3(board, currentPlayer);
+            ReverseStone3 reverser = new ReverseStone3(board, currentPlayer);
 // 追加した箇所、
             if (reverser.isLegalMove(row, col, currentPlayer)) {
                 board[row][col] = currentPlayer;
-            reverser.reverseStones(row, col, currentPlayer);
-            repaint();
-            currentPlayer = (currentPlayer == 1) ? 2 : 1; // 手番交代
+                reverser.reverseStones(row, col, currentPlayer);
+                repaint();
+                currentPlayer = (currentPlayer == 1) ? 2 : 1; // 手番交代
+                infoPanel.updateInfo(currentPlayer, board); // ← 手番と石数の表示を更新
             }
         }
     }
@@ -75,8 +70,14 @@ public class Game extends JPanel implements MouseListener {
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("オセロ");
+        GameInfoPanel infoPanel = new GameInfoPanel(); // ← 情報表示パネルの生成
+        Game gamePanel = new Game(infoPanel); // ← Gameに渡す
+
+        frame.setLayout(new BorderLayout());
+        frame.add(infoPanel, BorderLayout.NORTH); // ← 上部に情報表示
+        frame.add(gamePanel, BorderLayout.CENTER); // ← 中央に盤面
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().add(new Game());
         frame.pack();
         frame.setVisible(true);
     }
