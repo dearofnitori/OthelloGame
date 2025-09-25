@@ -1,0 +1,20 @@
+# オセロ機能追加
+
+## 追加内容
+- オセロ盤面描画の自動調整（BoardRenderer）
+- 手番と石数の表示（GameInfoPanel）
+- メイン制御（Game）
+
+# 特徴
+- 描画とロジックを分離し、保守性を向上
+- 盤面のみで手番と石数がわからないため、手番・石数表示
+- 自動サイズ調整で画面に柔軟対応
+
+## ファイル構成
+
+src/
+game/ 
+├── Game.java
+├── BoardRenderer.java 
+├── ReverseStone3.java 
+└── GameInfoPanel.java
