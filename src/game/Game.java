@@ -1,6 +1,6 @@
 package game;
-import java.awt.BorderLayout;
 //OthelloGUI
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -23,7 +23,7 @@ public class Game extends JPanel implements MouseListener {
         setPreferredSize(new Dimension(400, 400));
         setBackground(Color.GREEN);
         addMouseListener(this);
-        initBoard(); // ← 盤面初期化を忘れずに！
+        initBoard(); // ← 盤面初期化
     }
 
     private void initBoard() {
